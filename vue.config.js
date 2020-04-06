@@ -36,16 +36,16 @@ module.exports = {
       warnings: false,
       errors: true
     },
-    // proxy: {
-    //   '/api': {
-    //     target: `http://english-dev.qizoubx.com`, // 这个链接是要代理到的api地址
-    //     changeOrigin: true,
-    //     pathRewrite: {
-    //       '^/api': ''
-    //     }
-    //   }
-    // },
-    before: require('./mock/mock-server.js')
+    proxy: {
+      '/admin': {
+        target: `http://english-dev.qizoubx.com`, // 这个链接是要代理到的api地址
+        changeOrigin: true,
+        pathRewrite: {
+          '/admin': ''
+        }
+      }
+    }
+    // before: require('./mock/mock-server.js')
   },
   configureWebpack: {
     // provide the app's title in webpack's name field, so that
