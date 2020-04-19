@@ -38,7 +38,7 @@ module.exports = {
     },
     proxy: {
       '/admin': {
-        target: `http://english-dev.qizoubx.com`, // 这个链接是要代理到的api地址
+        target: `https://english-dev.qizoubx.com`, // 这个链接是要代理到的api地址
         changeOrigin: true,
         pathRewrite: {
           '/admin': ''
