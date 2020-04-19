@@ -8,10 +8,10 @@
       <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         Search
       </el-button>
-      <!-- <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
+      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
         Add
       </el-button>
-      <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">
+      <!-- <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">
         Export
       </el-button>
       <el-checkbox v-model="showReviewer" class="filter-item" style="margin-left:15px;" @change="tableKey=tableKey+1">
@@ -117,7 +117,7 @@
     </el-table>
 
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.current_page" :limit.sync="listQuery.per_page" @pagination="fetchData" />
-    <el-dialog title="Update" :visible.sync="dialogFormVisible">
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="80px" style="width: 350px; margin-left:20px;">
         <!-- <el-form-item label="Date" prop="timestamp">
           <el-date-picker v-model="temp.timestamp" type="datetime" placeholder="Please pick a date" />
@@ -149,7 +149,7 @@
         <el-button @click="dialogFormVisible = false">
           Cancel
         </el-button>
-        <el-button type="primary" @click="updateData()">
+        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
           Confirm
         </el-button>
       </div>
@@ -162,7 +162,7 @@
 import Video from 'video.js'
 import Vue from 'vue'
 import 'video.js/dist/video-js.css'
-import { getVideoList, updateVideoList } from '@/api/table'
+import { getVideoList, updateVideoList, addVideo } from '@/api/table'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
 Vue.prototype.$video = Video
@@ -200,6 +200,11 @@ export default {
       statusOptions: [{ label: '有效', key: 1 }, { label: '无效', key: 2 }],
       levelOptions: [{ label: '简单', key: 1 }, { label: '中等', key: 2 }, { label: '困难', key: 3 }],
       dialogFormVisible: false,
+      dialogStatus: '',
+      textMap: {
+        update: 'Edit',
+        create: 'Create'
+      },
       temp: {
         id: undefined,
         status: 1,
@@ -235,6 +240,46 @@ export default {
       this.listQuery.current_page = 1
       this.fetchData()
     },
+
+    resetTemp() {
+      this.temp = {
+        id: undefined,
+        status: 1,
+        sub_title: '',
+        distractor_title: '',
+        answer: '',
+        distractor: '',
+        level: 1
+      }
+    },
+
+    handleCreate() {
+      this.resetTemp()
+      this.dialogStatus = 'create'
+      this.dialogFormVisible = true
+      // this.$nextTick(() => {
+      //   this.$refs['dataForm'].clearValidate()
+      // })
+    },
+    createData() {
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
+          // this.temp.author = 'vue-element-admin'
+          addVideo(this.temp).then(() => {
+            this.list.unshift(this.temp)
+            this.dialogFormVisible = false
+            this.$notify({
+              title: 'Success',
+              message: 'Created Successfully',
+              type: 'success',
+              duration: 2000
+            })
+          })
+        }
+      })
+    },
+
     handleUpdate(row) {
       console.log('row>>>', row)
       this.temp = Object.assign({}, row) // copy obj

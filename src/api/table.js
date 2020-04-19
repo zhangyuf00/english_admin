@@ -23,3 +23,11 @@ export function updateVideoList(params) {
     params
   })
 }
+
+export function addVideo(params) {
+  return request({
+    url: '/admin/question/add',
+    method: 'post',
+    params
+  })
+}
